@@ -26,7 +26,7 @@ public class ExamplePlugin extends Plugin {
     hud = new ExampleHud();
     modules.register(hud);
     window = new ExampleWindow(460, 20, 240, 120);
-    windows().registerWindow(window);
+    registerWindow(window);
   }
 
   @Override
@@ -47,8 +47,46 @@ public class ExamplePlugin extends Plugin {
       hud = null;
     }
     if (window != null) {
-      windows().unregisterWindow(window.getTitle());
+      unregisterWindow(window.getTitle());
       window = null;
+    }
+  }
+
+  /**
+   * Registers through WindowsModule when the client supports it (reflection keeps
+   * this building against older client jars); otherwise adds to the live screen
+   * directly, which works until the screen rebuilds.
+   */
+  private static void registerWindow(me.friendly.exeter.window.Window window) {
+    Object windows = windows();
+    try {
+      windows
+          .getClass()
+          .getMethod("registerWindow", me.friendly.exeter.window.Window.class)
+          .invoke(windows, window);
+      return;
+    } catch (ReflectiveOperationException e) {
+      // Old client: fall through to the direct add below.
+    }
+    me.friendly.exeter.window.WindowScreen screen =
+        me.friendly.exeter.module.impl.toggle.client.WindowsModule.getScreen();
+    if (screen != null) {
+      screen.addWindow(window);
+    }
+  }
+
+  private static void unregisterWindow(String title) {
+    Object windows = windows();
+    try {
+      windows.getClass().getMethod("unregisterWindow", String.class).invoke(windows, title);
+      return;
+    } catch (ReflectiveOperationException e) {
+      // Old client: fall through to the direct remove below.
+    }
+    me.friendly.exeter.window.WindowScreen screen =
+        me.friendly.exeter.module.impl.toggle.client.WindowsModule.getScreen();
+    if (screen != null) {
+      screen.getWindows().removeIf(window -> window.getTitle().equalsIgnoreCase(title));
     }
   }
 
