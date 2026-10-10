@@ -54,7 +54,9 @@ jar {
 }
 
 processResources {
-    expand(project.properties)
+    filesMatching('exeter-plugin.json') {
+        expand(project.properties)
+    }
 }
 
 ext {
