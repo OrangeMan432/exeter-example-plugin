@@ -4,7 +4,6 @@ import me.friendly.exeter.core.Exeter;
 import me.friendly.exeter.module.ModuleManager;
 import me.friendly.exeter.module.impl.toggle.client.WindowsModule;
 import me.friendly.exeter.plugin.Plugin;
-import me.friendly.exeter.window.WindowScreen;
 
 /**
  * Entry point, loaded from the plugins folder because it extends {@link Plugin}.
@@ -26,11 +25,8 @@ public class ExamplePlugin extends Plugin {
     modules.register(module);
     hud = new ExampleHud();
     modules.register(hud);
-    WindowScreen screen = WindowsModule.getScreen();
-    if (screen != null) {
-      window = new ExampleWindow(460, 20, 240, 120);
-      screen.addWindow(window);
-    }
+    window = new ExampleWindow(460, 20, 240, 120);
+    windows().registerWindow(window);
   }
 
   @Override
@@ -50,10 +46,14 @@ public class ExamplePlugin extends Plugin {
       modules.unregister(hud);
       hud = null;
     }
-    WindowScreen screen = WindowsModule.getScreen();
-    if (screen != null && window != null) {
-      screen.getWindows().remove(window);
+    if (window != null) {
+      windows().unregisterWindow(window.getTitle());
       window = null;
     }
+  }
+
+  private static WindowsModule windows() {
+    return (WindowsModule)
+        Exeter.getInstance().getModuleManager().getModuleByAlias("windows");
   }
 }
