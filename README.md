@@ -31,6 +31,9 @@ plugin runs against.
 - `ExamplePlugin extends Plugin`: the client instantiates it from the jar and calls
   `startPlugin()` / `stopPlugin()`. Registration uses the same managers as
   built-in content (`ModuleManager.register`, `WindowsModule` screen).
+- `src/main/resources/exeter-plugin.json` carries the name, author and version the
+  client shows in its Installed tab (the version string comes from `modVersion`
+  via resource expansion, so bump it in one place).
 - Never bundle the game or the Exeter jar: both are `compileOnly`, the client
   supplies them at runtime.
 

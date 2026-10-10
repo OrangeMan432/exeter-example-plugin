@@ -53,6 +53,10 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+processResources {
+    expand(project.properties)
+}
+
 ext {
     googleJavaFormatVersion = '1.36.1'
 }
